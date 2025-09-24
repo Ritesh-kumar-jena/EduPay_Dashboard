@@ -3,10 +3,10 @@ const express=require("express")
 const cors=require("cors")
 const { connection } = require("./db")
 const { userRoute } = require("./Controller/userRoutes")
-const { orderRoutes } = require("./Controller/orderRoutes")
 const { paymentRoutes } = require("./Controller/paymentRoutes")
 const { transactionRoute } = require("./Controller/transactionRoutes")
 const { webhookRoute } = require("./Controller/webhookRoutes")
+const { orderRoute } = require("./Controller/orderRoutes")
 
 
 const port=process.env.port
@@ -25,7 +25,7 @@ app.get("/",(req,res)=>{
 })
 
 app.use("/users",userRoute)
-app.use("/orders",orderRoutes)
+app.use("/orders",orderRoute)
 app.use("/payments",paymentRoutes)
 app.use("/transactions",transactionRoute)
 app.use("/webhooklogs",webhookRoute)
