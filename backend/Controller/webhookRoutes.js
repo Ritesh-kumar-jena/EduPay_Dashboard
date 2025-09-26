@@ -1,6 +1,7 @@
 const express = require("express");
 const { webhookLogs } = require("../Model/webhookLogModel");
 const { orderStatus } = require("../Model/orderStatusModel");
+const mongoose=require("mongoose")
 
 const webhookRoute = express.Router();
 
@@ -12,7 +13,7 @@ webhookRoute.post("/", async (req, res) => {
     await new webhookLogs({ event: "payment_update", payload }).save();
 
     await orderStatus.findOneAndUpdate(
-      { collect_id: payload.order_info.order_id },
+      { collect_id: mongoose.Types.ObjectId(payload.order_info.order_id)},
       {
         order_amount: payload.order_info.order_amount,
         transaction_amount: payload.order_info.transaction_amount,
