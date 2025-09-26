@@ -52,7 +52,7 @@ paymentRoutes.post("/create-payment", async (req, res) => {
       }
     );
 
-    const { Collect_request_url } = response.data;
+    const { collect_request_url } = response.data;
 
     const statusDoc = new orderStatus({
       collect_id: currentOrder._id,  
@@ -67,7 +67,7 @@ paymentRoutes.post("/create-payment", async (req, res) => {
     res.status(200).send({
       msg: "Payment link created successfully",
       orderId: currentOrder._id,
-      payment_url: Collect_request_url,
+      payment_url: collect_request_url,
       status: statusDoc,
     });
   } catch (error) {
