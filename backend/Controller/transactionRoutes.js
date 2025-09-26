@@ -8,7 +8,16 @@ transactionRoute.use(auth)
 
 transactionRoute.get("/", async (req, res) => {
   try {
-    const transactions = await orderStatus.aggregate([
+    const { page = 1, limit = 10, status } = req.query;
+
+    const matchStage = {};
+    if (status) {
+      matchStage.status = status;
+    }
+
+    const skip = (page - 1) * limit;
+
+    const pipeline = [
       {
         $lookup: {
           from: "orders",
@@ -18,6 +27,7 @@ transactionRoute.get("/", async (req, res) => {
         },
       },
       { $unwind: "$order_info" },
+      { $match: matchStage },
       {
         $project: {
           collect_id: 1,
@@ -28,12 +38,30 @@ transactionRoute.get("/", async (req, res) => {
           status: 1,
         },
       },
+    ];
+
+
+    const totalCount = await orderStatus.aggregate([...pipeline, { $count: "count" }]);
+    const count = totalCount[0]?.count || 0;
+
+    
+    const transactions = await orderStatus.aggregate([
+      ...pipeline,
+      { $skip: parseInt(skip) },
+      { $limit: parseInt(limit) },
     ]);
-    res.status(200).send(transactions);
+
+    res.status(200).json({
+      transactions,
+      totalCount: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 transactionRoute.get("/school/:schoolId", async (req, res) => {
